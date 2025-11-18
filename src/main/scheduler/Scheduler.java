@@ -93,7 +93,27 @@ public class Scheduler {
     }
 
     private static void createPatient(String[] tokens) {
-        // TODO: Part 1
+        if(tokens.length != 3){
+            System.out.println("Failed to create patient.");
+            return;
+        }
+        String patientUsername = tokens[1];
+        String patientPassword = tokens[2];
+
+        if(patientUsernameExists(patientUsername)){
+            System.out.println("Username taken, try again.");
+            return;
+        }
+        byte[] salt = Util.generateSalt();
+        byte[] hash = Util.generateHash(patientPassword, salt);
+
+        try {
+            Patient patient = new Patient.PatientBuilder(patientUsername, salt, hash).build();
+            patient.saveToDB();
+            System.out.println("Created patient " + patientUsername);
+        } catch (SQLException e){
+            System.out.println("Create patient failed.");
+        }
     }
 
     private static void createCaregiver(String[] tokens) {
@@ -142,8 +162,52 @@ public class Scheduler {
         return true;
     }
 
+    private static boolean patientUsernameExists(String patientUsername) {
+        ConnectionManager cm = new ConnectionManager();
+        Connection con = cm.createConnection();
+
+        String selectPatientUsername = "SELECT * FROM Patients WHERE Username = ?";
+        try {
+            PreparedStatement statement = con.prepareStatement(selectPatientUsername);
+            statement.setString(1, patientUsername);
+            ResultSet resultSet = statement.executeQuery();
+
+            return resultSet.isBeforeFirst();
+        } catch (SQLException e) {
+            System.out.println("Create patient failed");
+        } finally {
+            cm.closeConnection();
+        }
+        return true;
+    }
+
     private static void loginPatient(String[] tokens) {
         // TODO: Part 1
+        if (currentCaregiver != null || currentPatient != null) {
+            System.out.println("User already logged in.");
+            return;
+        }
+        // check 2: the length for tokens need to be exactly 3 to include all information (with the operation name)
+        if (tokens.length != 3) {
+            System.out.println("Login failed.");
+            return;
+        }
+        String patientUsername = tokens[1];
+        String patientPassword = tokens[2];
+
+        Patient patient = null;
+        try {
+            patient = new Patient.PatientGetter(patientUsername, patientPassword).get();
+        } catch (SQLException e) {
+            System.out.println("Login failed.");
+        }
+        // check if the login was successful
+        if (patient == null) {
+            System.out.println("Login failed.");
+        } else {
+            System.out.println("Logged in as: " + patientUsername);
+            currentPatient = patient;
+        }
     }
 
     private static void loginCaregiver(String[] tokens) {

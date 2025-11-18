@@ -53,24 +53,7 @@ public class Patient {
         }
     }
 
-    public void uploadAvailability(Date d) throws SQLException {
-        ConnectionManager cm = new ConnectionManager();
-        Connection con = cm.createConnection();
-
-        String addAvailability = "INSERT INTO Availabilities VALUES (? , ?)";
-        try {
-            PreparedStatement statement = con.prepareStatement(addAvailability);
-            statement.setDate(1, d);
-            statement.setString(2, this.username);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new SQLException();
-        } finally {
-            cm.closeConnection();
-        }
-    }
-
-    public static class PatientBuilder {
+       public static class PatientBuilder {
         private final String username;
         private final byte[] salt;
         private final byte[] hash;
