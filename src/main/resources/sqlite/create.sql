@@ -26,7 +26,6 @@ CREATE TABLE Appointments(Appointment_ID INT PRIMARY KEY,
                           Patient_Username VARCHAR(255),
                           Vaccine VARCHAR(255),
                           Time date,
-                          FOREIGN KEY (Caregiver_Username) REFERENCES Availabilities.Username,
+                          FOREIGN KEY (Time, Caregiver_Username) REFERENCES Availabilities.Username,
                           FOREIGN KEY (Patient_Username) REFERENCES Patients.Username,
-                          FOREIGN KEY (Vaccine) REFERENCES Vaccines.Name,
-                          FOREIGN KEY (Time) REFERENCES Availabilities.Time);
+                          FOREIGN KEY (Vaccine) REFERENCES Vaccines.Name);
