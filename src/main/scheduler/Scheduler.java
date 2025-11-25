@@ -187,7 +187,6 @@ public class Scheduler {
             System.out.println("User already logged in.");
             return;
         }
-        // check 2: the length for tokens need to be exactly 3 to include all information (with the operation name)
         if (tokens.length != 3) {
             System.out.println("Login failed.");
             return;
@@ -201,7 +200,6 @@ public class Scheduler {
         } catch (SQLException e) {
             System.out.println("Login failed.");
         }
-        // check if the login was successful
         if (patient == null) {
             System.out.println("Login failed.");
         } else {
