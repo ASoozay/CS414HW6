@@ -94,14 +94,14 @@ public class Scheduler {
 
     private static void createPatient(String[] tokens) {
         if(tokens.length != 3){
-            System.out.println("Failed to create patient.");
+            System.out.println("Create patient failed");
             return;
         }
         String patientUsername = tokens[1];
         String patientPassword = tokens[2];
 
         if(patientUsernameExists(patientUsername)){
-            System.out.println("Username taken, try again.");
+            System.out.println("Username taken, try again");
             return;
         }
         byte[] salt = Util.generateSalt();
@@ -112,7 +112,7 @@ public class Scheduler {
             patient.saveToDB();
             System.out.println("Created patient " + patientUsername);
         } catch (SQLException e){
-            System.out.println("Create patient failed.");
+            System.out.println("Create patient failed");
         }
     }
 
@@ -187,7 +187,6 @@ public class Scheduler {
             System.out.println("User already logged in.");
             return;
         }
-        // check 2: the length for tokens need to be exactly 3 to include all information (with the operation name)
         if (tokens.length != 3) {
             System.out.println("Login failed.");
             return;
@@ -201,7 +200,6 @@ public class Scheduler {
         } catch (SQLException e) {
             System.out.println("Login failed.");
         }
-        // check if the login was successful
         if (patient == null) {
             System.out.println("Login failed.");
         } else {
