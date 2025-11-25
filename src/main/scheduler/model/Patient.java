@@ -22,7 +22,6 @@ public class Patient {
         this.hash = getter.hash;
     }
 
-    // Getters
     public String getUsername(){
         return username;
     }
@@ -45,23 +44,6 @@ public class Patient {
             statement.setString(1, this.username);
             statement.setBytes(2, this.salt);
             statement.setBytes(3, this.hash);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new SQLException();
-        } finally {
-            cm.closeConnection();
-        }
-    }
-
-    public void uploadAvailability(Date d) throws SQLException {
-        ConnectionManager cm = new ConnectionManager();
-        Connection con = cm.createConnection();
-
-        String addAvailability = "INSERT INTO Availabilities VALUES (? , ?)";
-        try {
-            PreparedStatement statement = con.prepareStatement(addAvailability);
-            statement.setDate(1, d);
-            statement.setString(2, this.username);
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new SQLException();
@@ -108,11 +90,9 @@ public class Patient {
                 ResultSet resultSet = statement.executeQuery();
                 while (resultSet.next()) {
                     byte[] salt = resultSet.getBytes("Salt");
-                    // we need to call Util.trim() to get rid of the paddings,
-                    // try to remove the use of Util.trim() and you'll see :)
                     byte[] hash = Util.trim(resultSet.getBytes("Hash"));
-                    // check if the password matches
                     byte[] calculatedHash = Util.generateHash(password, salt);
+                    
                     if (!Arrays.equals(hash, calculatedHash)) {
                         return null;
                     } else {
