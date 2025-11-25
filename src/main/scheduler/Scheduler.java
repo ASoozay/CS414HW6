@@ -110,9 +110,9 @@ public class Scheduler {
         try {
             Patient patient = new Patient.PatientBuilder(patientUsername, salt, hash).build();
             patient.saveToDB();
-            System.out.println("Created patient " + patientUsername);
+            System.out.println("Created user " + patientUsername);
         } catch (SQLException e){
-            System.out.println("Create patient failed");
+            System.out.println("Create user failed");
         }
     }
 
@@ -184,11 +184,11 @@ public class Scheduler {
     private static void loginPatient(String[] tokens) {
         // TODO: Part 1
         if (currentCaregiver != null || currentPatient != null) {
-            System.out.println("User already logged in.");
+            System.out.println("User already logged in, try again");
             return;
         }
         if (tokens.length != 3) {
-            System.out.println("Login failed.");
+            System.out.println("Login patient failed");
             return;
         }
         String patientUsername = tokens[1];
@@ -198,12 +198,12 @@ public class Scheduler {
         try {
             patient = new Patient.PatientGetter(patientUsername, patientPassword).get();
         } catch (SQLException e) {
-            System.out.println("Login failed.");
+            System.out.println("Login patient failed");
         }
         if (patient == null) {
-            System.out.println("Login failed.");
+            System.out.println("Login patient failed");
         } else {
-            System.out.println("Logged in as: " + patientUsername);
+            System.out.println("Logged in as " + patientUsername);
             currentPatient = patient;
         }
     }
