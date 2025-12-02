@@ -472,12 +472,12 @@ public class Scheduler {
 
     private static void showAppointments(String[] tokens) {
         // TODO: Part 2
-        if(tokens.length != 1){
+        if (tokens.length != 1) {
             System.out.println("Please try again");
             return;
         }
 
-        if(currentCaregiver == null && currentPatient == null) {
+        if (currentCaregiver == null && currentPatient == null) {
             System.out.println("Please login first");
             return;
         }
@@ -486,44 +486,63 @@ public class Scheduler {
         Connection con = cm.createConnection();
 
         try {
-            if(currentCaregiver == null) {
-                String patientUsername = currentPatient.getUsername();
-                String show_apps_p = "SELECT Appointment_ID, Vaccine, Time, Caregiver_Username FROM Appointments WHERE Patient_Username = ? ORDER BY Appointment_ID";
-                PreparedStatement statement_p = con.prepareStatement(show_apps_p);
-                statement_p.setString(1, patientUsername);
-                ResultSet resultSet_p = statement_p.executeQuery();
+               if (currentCaregiver == null) {
+                    String patientUsername = currentPatient.getUsername();
 
-                if(!resultSet_p.next()){
-                    System.out.println("No appointments scheduled");
-                    return;
-                }
-                while(resultSet_p.next()){
-                    String app_id = resultSet_p.getString("Appointment_ID");
-                    String vaccine = resultSet_p.getString("Vaccine");
-                    Date date = resultSet_p.getDate("Time");
-                    String caregiver = resultSet_p.getString("Caregiver_Username");
+                    String get_appointments = "SELECT Appointment_ID, Vaccine, Time, Caregiver_Username FROM Appointments WHERE Patient_Username = ?";
+                    PreparedStatement ga_statement = con.prepareStatement(get_appointments);
+                    ga_statement.setString(1, patientUsername);
+                    ResultSet patient_apps = ga_statement.executeQuery();
+
+                    if(!patient_apps.next()) {
+                        System.out.println("No appointments scheduled");
+                        return;
+                    }
+
+                    int app_id = patient_apps.getInt("Appointment_ID");
+                    String vaccine = patient_apps.getString("Vaccine");
+                    Date date = patient_apps.getDate("Time");
+                    String caregiver = patient_apps.getString("Caregiver_Username");
                     System.out.println(app_id + " " + vaccine + " " + date + " " + caregiver);
-                }
-            } else if (currentPatient == null) {
-                String caregiverUsername = currentCaregiver.getUsername();
-                String show_apps_c = "SELECT Appointment_ID, Vaccine, Time, Patient_Username FROM Appointments WHERE Caregiver_Username = ? ORDER BY Appointment_ID";
-                PreparedStatement statement_c = con.prepareStatement(show_apps_c);
-                statement_c.setString(1, caregiverUsername);
-                ResultSet resultSet_c = statement_c.executeQuery();
 
-                if (!resultSet_c.next()) {
-                    System.out.println("No appointments scheduled");
-                    return;
-                }
-                while (resultSet_c.next()) {
-                    String app_id = resultSet_c.getString("Appointment_ID");
-                    String vaccine = resultSet_c.getString("Vaccine");
-                    Date date = resultSet_c.getDate("Time");
-                    String patient = resultSet_c.getString("Patient_Username");
-                    System.out.println(app_id + " " + vaccine + " " + date + " " + patient);
-                }
-            }
-        } catch (SQLException e){
+                    while(patient_apps.next()){
+                        app_id = patient_apps.getInt("Appointment_ID");
+                        vaccine = patient_apps.getString("Vaccine");
+                        date = patient_apps.getDate("Time");
+                        caregiver = patient_apps.getString("Caregiver_Username");
+                        System.out.println(app_id + " " + vaccine + " " + date + " " + caregiver);
+                    }
+               }
+
+               if(currentPatient == null) {
+                   String caregiverUsername = currentCaregiver.getUsername();
+
+                   String get_appointments = "SELECT Appointment_ID, Vaccine, Time, Patient_Username FROM Appointments WHERE Caregiver_Username = ?";
+                   PreparedStatement ga_statement = con.prepareStatement(get_appointments);
+                   ga_statement.setString(1, caregiverUsername);
+                   ResultSet caregiver_apps = ga_statement.executeQuery();
+
+                   if (!caregiver_apps.next()) {
+                       System.out.println("No appointments scheduled");
+                       return;
+                   }
+
+                   int app_id = caregiver_apps.getInt("Appointment_ID");
+                   String vaccine = caregiver_apps.getString("Vaccine");
+                   Date date = caregiver_apps.getDate("Time");
+                   String patient = caregiver_apps.getString("Patient_Username");
+                   System.out.println(app_id + " " + vaccine + " " + date + " " + patient);
+
+                   while (caregiver_apps.next()) {
+                       app_id = caregiver_apps.getInt("Appointment_ID");
+                       vaccine = caregiver_apps.getString("Vaccine");
+                       date = caregiver_apps.getDate("Time");
+                       patient = caregiver_apps.getString("Patient_Username");
+                       System.out.println(app_id + " " + vaccine + " " + date + " " + patient);
+                   }
+               }
+
+        } catch (SQLException e) {
             System.out.println("Please try again");
         } finally {
             cm.closeConnection();
