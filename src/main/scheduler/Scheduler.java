@@ -350,7 +350,6 @@ public class Scheduler {
             }
             // get here, caregiver and vaccine are available
 
-            available_caregivers.next();
             String caregiver = available_caregivers.getString("Username");
 
             String remove_caregiver = "DELETE FROM Availabilities WHERE Username = ? AND Time = ?";
@@ -359,7 +358,6 @@ public class Scheduler {
             rc_statement.setDate(2, date);
             rc_statement.executeUpdate();
 
-            vaccine_dose.next();
             int num_doses = vaccine_dose.getInt("Doses");
             if(num_doses == 1){
                 String remove_vaccine = "DELETE FROM Vaccines WHERE Name = ?";
@@ -377,10 +375,11 @@ public class Scheduler {
             String num_apps = "SELECT COUNT(*) FROM Appointments";
             PreparedStatement na_statement = con.prepareStatement(num_apps);
             ResultSet sch_apps = na_statement.executeQuery();
+            sch_apps.next();
             int apps_count = sch_apps.getInt("COUNT(*)");
             int app_id = apps_count + 1;
 
-            String schedule_app = "INSERT INTO Appointments (?, ?, ?, ?, ?)";
+            String schedule_app = "INSERT INTO Appointments VALUES (?, ?, ?, ?, ?)";
             PreparedStatement sa_statement = con.prepareStatement(schedule_app);
             sa_statement.setInt(1, app_id);
             sa_statement.setString(2, caregiver);
