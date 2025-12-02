@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
 import java.time.DateTimeException;
+import java.time.format.DateTimeParseException;
 
 public class Scheduler {
 
@@ -293,6 +294,9 @@ public class Scheduler {
 
         } catch (SQLException e){
             System.out.println("Please try again");
+        } catch (DateTimeParseException e){
+            System.out.println("Please try again");
+            return;
         } catch (DateTimeException e) {
             System.out.println("Please try again");
             return;
@@ -333,6 +337,7 @@ public class Scheduler {
 
             if(!vaccineDose.next()){
                 System.out.println("Not enough available doses");
+                return;
             }
 
             vaccineDose.next();
@@ -342,6 +347,7 @@ public class Scheduler {
                System.out.println("Not enough available doses");
                return;
             }
+            // get here, vaccine ie there and has at least 1 dose
 
             String checkCaregivers = "SELECT Username FROM Availabilities WHERE Time = ? ORDER BY Username";
             statement = con.prepareStatement(checkCaregivers);
@@ -351,14 +357,23 @@ public class Scheduler {
 
             if(!resultSet.next()){
                 System.out.println("No caregiver is available");
-            } else {
+                return;
+            }
+
+                resultSet.next();
                 caregiverUsername = resultSet.getString("Username");
                 String removeCaregiver = "DELETE FROM Availabilities WHERE Time = ? AND Username = ?";
                 statement = con.prepareStatement(removeCaregiver);
                 statement.setDate(1, date);
                 statement.setString(2, caregiverUsername);
                 statement.executeUpdate();
-            }
+
+            int new_amt = doses - 1;
+            String edit_count = "UPDATE Vaccines SET Doses = ? WHERE Name = ?";
+            PreparedStatement updateDoses = con.prepareStatement(edit_count);
+            updateDoses.setInt(1, new_amt);
+            updateDoses.setString(2, vaccine);
+            updateDoses.executeUpdate();
 
             String num_appointments_q = "SELECT COUNT(*) FROM Appointments";
             statement = con.prepareStatement(num_appointments_q);
@@ -376,13 +391,6 @@ public class Scheduler {
             statement.setString(4, vaccine);
             statement.setDate(5, date);
             statement.executeUpdate();
-
-            int new_amt = doses - 1;
-            String edit_count = "UPDATE Vaccines SET Doses = ? WHERE Name = ?";
-            PreparedStatement updateDoses = con.prepareStatement(edit_count);
-            updateDoses.setInt(1, new_amt);
-            updateDoses.setString(2, vaccine);
-            updateDoses.executeUpdate();
 
             System.out.println("Appointment ID " + appointment_id + ", Caregiver username " + caregiverUsername);
 
