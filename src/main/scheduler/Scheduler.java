@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.sql.Date;
 import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
-import java.time.LocalDate;
+import java.util.zip.DataFormatException;
 
 public class Scheduler {
 
@@ -253,21 +253,21 @@ public class Scheduler {
             return;
         }
 
+
+
         ConnectionManager cm = new ConnectionManager();
         Connection con = cm.createConnection();
 
-        System.out.println("Caregivers:");
-        String date_string = tokens[1];
+        Date date = null;
         try {
-            LocalDate localDate = LocalDate.parse(date_string);
-        } catch (DateTimeParseException e){
-            System.out.println("Please try again");
-            return;
-        } catch (DateTimeException e){
+            String date_string = tokens[1];
+            date = Date.valueOf(date_string);
+        } catch (IllegalArgumentException e) {
             System.out.println("Please try again");
             return;
         }
-        Date date = Date.valueOf(date_string);
+
+        System.out.println("Caregivers:");
 
         String availableCaregivers = "SELECT Username FROM Availabilities WHERE Time = ? ORDER BY Username";
 
