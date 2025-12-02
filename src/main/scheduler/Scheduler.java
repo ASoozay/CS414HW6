@@ -331,18 +331,16 @@ public class Scheduler {
             statement.setString(1, vaccine);
             ResultSet vaccineDose = statement.executeQuery();
 
+            if(!vaccineDose.next()){
+                System.out.println("Not enough available doses");
+            }
+
             vaccineDose.next();
             int doses = vaccineDose.getInt("Doses");
+
             if (doses == 0){
                System.out.println("Not enough available doses");
                return;
-            } else {
-                int new_amt = doses - 1;
-                String edit_count = "UPDATE Vaccines SET Doses = ? WHERE Name = ?";
-                PreparedStatement updateDoses = con.prepareStatement(edit_count);
-                updateDoses.setString(2, vaccine);
-                updateDoses.setInt(1, new_amt);
-                updateDoses.executeUpdate();
             }
 
             String checkCaregivers = "SELECT Username FROM Availabilities WHERE Time = ? ORDER BY Username";
@@ -378,6 +376,13 @@ public class Scheduler {
             statement.setString(4, vaccine);
             statement.setDate(5, date);
             statement.executeUpdate();
+
+            int new_amt = doses - 1;
+            String edit_count = "UPDATE Vaccines SET Doses = ? WHERE Name = ?";
+            PreparedStatement updateDoses = con.prepareStatement(edit_count);
+            updateDoses.setInt(1, new_amt);
+            updateDoses.setString(2, vaccine);
+            updateDoses.executeUpdate();
 
             System.out.println("Appointment ID " + appointment_id + ", Caregiver username " + caregiverUsername);
 
