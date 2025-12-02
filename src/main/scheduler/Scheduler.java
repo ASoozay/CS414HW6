@@ -240,6 +240,11 @@ public class Scheduler {
 
     private static void searchCaregiverSchedule(String[] tokens) {
         // TODO: Part 2
+        if(tokens.length != 2){
+            System.out.println("Please try again");
+            return;
+        }
+
         if(currentCaregiver == null && currentPatient == null){
             System.out.println("Please login first");
             return;
@@ -287,6 +292,9 @@ public class Scheduler {
 
         } catch (SQLException e){
             System.out.println("Please try again");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Please try again");
+            return;
         } finally {
             cm.closeConnection();
         }
@@ -295,6 +303,11 @@ public class Scheduler {
 
     private static void reserve(String[] tokens) {
         // TODO: Part 2
+        if(tokens.length != 3){
+            System.out.println("Please try again");
+            return;
+        }
+
         if(currentCaregiver != null){
             System.out.println("Please login as a patient");
             return;
@@ -323,7 +336,6 @@ public class Scheduler {
                System.out.println("Not enough available doses");
                return;
             } else {
-                System.out.println(doses + "Doses available");
                 int new_amt = doses - 1;
                 String edit_count = "UPDATE Vaccines SET Doses = ? WHERE Name = ?";
                 PreparedStatement updateDoses = con.prepareStatement(edit_count);
@@ -341,7 +353,6 @@ public class Scheduler {
             if(!resultSet.next()){
                 System.out.println("No caregiver is available");
             } else {
-                System.out.println("Caregivers available");
                 caregiverUsername = resultSet.getString("Username");
                 String removeCaregiver = "DELETE FROM Availabilities WHERE Time = ? AND Username = ?";
                 statement = con.prepareStatement(removeCaregiver);
@@ -446,6 +457,11 @@ public class Scheduler {
 
     private static void showAppointments(String[] tokens) {
         // TODO: Part 2
+        if(tokens.length != 1){
+            System.out.println("Please try again");
+            return;
+        }
+
         if(currentCaregiver == null && currentPatient == null) {
             System.out.println("Please login first");
             return;
@@ -501,6 +517,11 @@ public class Scheduler {
 
     private static void logout(String[] tokens) {
         // TODO: Part 2
+        if(tokens.length != 1) {
+            System.out.println("Please try again");
+            return;
+        }
+
         if(currentCaregiver == null && currentPatient == null){
             System.out.println("Please login first");
             return;
