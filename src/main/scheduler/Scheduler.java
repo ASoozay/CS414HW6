@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Date;
 import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
+import java.time.LocalDate;
 
 public class Scheduler {
 
@@ -251,12 +252,23 @@ public class Scheduler {
             System.out.println("Please login first");
             return;
         }
+
         ConnectionManager cm = new ConnectionManager();
         Connection con = cm.createConnection();
 
         System.out.println("Caregivers:");
         String date_string = tokens[1];
+        try {
+            LocalDate localDate = LocalDate.parse(date_string);
+        } catch (DateTimeParseException e){
+            System.out.println("Please try again");
+            return;
+        } catch (DateTimeException e){
+            System.out.println("Please try again");
+            return;
+        }
         Date date = Date.valueOf(date_string);
+
         String availableCaregivers = "SELECT Username FROM Availabilities WHERE Time = ? ORDER BY Username";
 
         try {
@@ -294,16 +306,9 @@ public class Scheduler {
 
         } catch (SQLException e){
             System.out.println("Please try again");
-        } catch (DateTimeParseException e){
-            System.out.println("Please try again");
-            return;
-        } catch (DateTimeException e) {
-            System.out.println("Please try again");
-            return;
         } finally {
             cm.closeConnection();
         }
-
     }
 
     private static void reserve(String[] tokens) {
