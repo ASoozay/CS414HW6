@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
+import java.time.DateTimeException;
 
 public class Scheduler {
 
@@ -292,7 +293,7 @@ public class Scheduler {
 
         } catch (SQLException e){
             System.out.println("Please try again");
-        } catch (IllegalArgumentException e) {
+        } catch (DateTimeException e) {
             System.out.println("Please try again");
             return;
         } finally {
@@ -473,7 +474,7 @@ public class Scheduler {
         try {
             if(currentCaregiver == null) {
                 String patientUsername = currentPatient.getUsername();
-                String show_apps_p = "SELECT Appoitnment_ID, Vaccine, Time, Caregiver_Username FROM Appointments WHERE Patient_Username = ? ORDER BY Appointment_ID";
+                String show_apps_p = "SELECT Appointment_ID, Vaccine, Time, Caregiver_Username FROM Appointments WHERE Patient_Username = ? ORDER BY Appointment_ID";
                 PreparedStatement statement_p = con.prepareStatement(show_apps_p);
                 statement_p.setString(1, patientUsername);
                 ResultSet resultSet_p = statement_p.executeQuery();
